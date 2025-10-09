@@ -29,6 +29,22 @@ jobs:
       - name: Run a one-line script
         run: echo Hello, world!
 
+      - name: Install Pandoc and LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive texlive-xetex
+
+      - name: Generate HTML and PDF
+        run: |
+          mkdir -p output
+          pandoc README.md -s -o output/html.html
+          pandoc README.md -s -o output/pdf.pdf
+
+      - name: Upload generated documents
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentos-generados
+          path: output/
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
