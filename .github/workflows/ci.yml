@@ -1,4 +1,4 @@
-name: CI con autocommit (Node.js)
+name: CI con autocommit
 
 on:
   push:
@@ -14,55 +14,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Clonar el repositorio
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Configurar Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      # Instalar dependencias del proyecto
       - name: Install dependencies
         run: npm ci
 
-      # Generar documentación con JSDoc
       - name: Generate JSDoc
         run: npx jsdoc -c jsdoc.json
 
-        # Nota: se asume que tienes un archivo jsdoc.json configurado.
-        # Por defecto, JSDoc genera la salida en ./out o ./docs dependiendo de tu config.
-
-      # Mover la documentación al directorio final
       - name: Move JSDoc to custom path
         run: |
           mkdir -p docs/_build/html
           rm -rf docs/_build/html/*
           cp -r out/. docs/_build/html/
 
-      # Instalar wkhtmltopdf
       - name: Install wkhtmltopdf
         run: |
           sudo apt-get update
           sudo apt-get install -y wkhtmltopdf
 
-      # Crear carpeta para PDF
       - name: Prepare PDF output directory
         run: |
           mkdir -p docs/pdf
           rm -f docs/pdf/report.pdf
 
-      # Convertir la documentación a PDF
       - name: Convert HTML to PDF
         run: |
           wkhtmltopdf --enable-local-file-access \
           docs/_build/html/index.html \
           docs/pdf/report.pdf
 
-      # Subir artefactos (para consulta en GitHub Actions)
       - name: Upload documentation artifacts
         uses: actions/upload-artifact@v4.6.2
         with:
@@ -71,7 +59,6 @@ jobs:
             docs/_build/html/
             docs/pdf/report.pdf
 
-      # Commit & push automático
       - name: Commit and push JSDoc
         run: |
           git config --global user.name "JoseAntonioDiazBusati"
